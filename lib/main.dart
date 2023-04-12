@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -91,7 +94,21 @@ class _ImageClassifierState extends State<ImageClassifier> {
       _isloading = true;
     });
     final imageBytes = await _image!.readAsBytes();
-    final base64Image = base64Encode(imageBytes);
+    final double imageSizeInKB = imageBytes.length / 1024;
+
+    Uint8List processedImageBytes;
+    debugPrint('Image size: $imageSizeInKB KB');
+    if (imageSizeInKB > 500) {
+      processedImageBytes = await FlutterImageCompress.compressWithList(
+        imageBytes,
+        minHeight: 300,
+        minWidth: 300,
+        quality: 70,
+      );
+    } else {
+      processedImageBytes = imageBytes;
+    }
+    final base64Image = base64Encode(processedImageBytes);
     print(_csrfToken);
     final response = await http.post(
       Uri.parse('https://porsche.bene.photos/classify_image/'),
