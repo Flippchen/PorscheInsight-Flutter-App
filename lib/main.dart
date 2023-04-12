@@ -114,7 +114,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -139,43 +139,43 @@ class _ImageClassifierState extends State<ImageClassifier> {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _pickImage,
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).accentColor,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(Icons.image),
                   SizedBox(width: 8),
                   Text('Pick Image'),
                 ],
               ),
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).accentColor,
-              ),
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _pickImageCamera,
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).accentColor,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(Icons.camera_alt),
                   SizedBox(width: 8),
                   Text("Take a picture"),
                 ],
               ),
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).accentColor,
-              ),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
                 'Model:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             DropdownButton<String>(
               value: _selectedModel,
-              icon: Icon(Icons.arrow_downward),
+              icon: const Icon(Icons.arrow_downward),
               onChanged: (String? newValue) {
                 setState(() {
                   _selectedModel = newValue!;
@@ -191,20 +191,20 @@ class _ImageClassifierState extends State<ImageClassifier> {
             ),
             ElevatedButton(
               onPressed: _classifyImage,
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).accentColor,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(Icons.directions_car),
                   SizedBox(width: 8),
                   Text('Classify Image'),
                 ],
               ),
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).accentColor,
-              ),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Result:',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
@@ -227,7 +227,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
                             color: Theme.of(context).accentColor,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
