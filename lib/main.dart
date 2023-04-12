@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, brightness: Brightness.dark, accentColor: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Image Classifier'),
+          title: Text('Porsche Classifier'),
         ),
         body: ImageClassifier(),
       ),
@@ -45,6 +45,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
   List<dynamic> _result = [];
+  bool _isloading = false;
 
   @override
   void initState() {
@@ -86,7 +87,9 @@ class _ImageClassifierState extends State<ImageClassifier> {
     if (_image == null) {
       return;
     }
-
+    setState(() {
+      _isloading = true;
+    });
     final imageBytes = await _image!.readAsBytes();
     final base64Image = base64Encode(imageBytes);
     print(_csrfToken);
@@ -100,6 +103,9 @@ class _ImageClassifierState extends State<ImageClassifier> {
       },
       body: jsonEncode({'image_data': base64Image, "model_name": _selectedModel}),
     );
+    setState(() {
+      _isloading = false;
+    });
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
       setState(() {
@@ -190,7 +196,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
               }).toList(),
             ),
             ElevatedButton(
-              onPressed: _classifyImage,
+              onPressed: _isloading? null: _classifyImage,
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).accentColor,
               ),
@@ -208,6 +214,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
               'Result:',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
+            _isloading? Center(child: SizedBox(width: 50, height:50,child: const CircularProgressIndicator())):
             _result.length > 0
                 ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
