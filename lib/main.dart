@@ -35,15 +35,13 @@ class _ImageClassifierState extends State<ImageClassifier> {
   String model = "";
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
-  String _result = '';
+  List<dynamic> _result = [];
 
   @override
   void initState() {
     super.initState();
     _fetchCsrfToken();
   }
-
-
 
   Future<void> _pickImage() async {
     final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
@@ -61,7 +59,8 @@ class _ImageClassifierState extends State<ImageClassifier> {
 
     if (response.statusCode == 200) {
       setState(() {
-        _csrfToken = response.headers['set-cookie']!.split(';')[0].split('=')[1];
+        _csrfToken =
+            response.headers['set-cookie']!.split(';')[0].split('=')[1];
       });
     }
   }
@@ -84,13 +83,12 @@ class _ImageClassifierState extends State<ImageClassifier> {
       },
       body: jsonEncode({'image_data': base64Image, "model_name": "car_type"}),
     );
-
-    print(response.statusCode);
-    print(response.body);
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
       setState(() {
-        _result = result.join(', ');
+        print(result);
+        print(result.runtimeType);
+        _result = result;
       });
     }
   }
@@ -101,25 +99,25 @@ class _ImageClassifierState extends State<ImageClassifier> {
       child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.stre tch,
           children: [
             _image == null
                 ? Container(
-              height: 300,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                color: Colors.grey[200],
-              ),
-              child: Center(child: Text('No image selected')),
-            )
+                    height: 300,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: Colors.grey[200],
+                    ),
+                    child: Center(child: Text('No image selected')),
+                  )
                 : ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.file(
-                File(_image!.path),
-                height: 300,
-                fit: BoxFit.cover,
-              ),
-            ),
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.file(
+                      File(_image!.path),
+                      height: 300,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _pickImage,
@@ -131,13 +129,26 @@ class _ImageClassifierState extends State<ImageClassifier> {
               child: Text('Classify Image'),
             ),
             SizedBox(height: 16),
-
             Text(
               'Result:',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            SizedBox(height: 8),
-            Text(_result),
+            _result.length > 0
+                ? Row(
+                    children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children:
+                              _result.map((result) => Text(result[0])).toList(),
+                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children:
+                          _result.map((result) => Text(result[1].toString())).toList(),
+                      )
+                      ],
+                    )
+                : Text("Results will be displayed here"),
           ],
         ),
       ),
