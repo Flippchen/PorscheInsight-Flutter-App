@@ -99,7 +99,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
       child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stre tch,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _image == null
                 ? Container(
