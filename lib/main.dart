@@ -13,6 +13,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Image Classifier'),
@@ -29,15 +31,37 @@ class ImageClassifier extends StatefulWidget {
 }
 
 class _ImageClassifierState extends State<ImageClassifier> {
+  String _csrfToken = '';
+  String model = "";
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
   String _result = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCsrfToken();
+  }
+
+
 
   Future<void> _pickImage() async {
     final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       setState(() {
         _image = pickedImage;
+      });
+    }
+  }
+
+  Future<void> _fetchCsrfToken() async {
+    final response = await http.get(
+      Uri.parse('https://porsche.bene.photos/classify'),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _csrfToken = response.headers['set-cookie']!.split(';')[0].split('=')[1];
       });
     }
   }
@@ -49,15 +73,20 @@ class _ImageClassifierState extends State<ImageClassifier> {
 
     final imageBytes = await _image!.readAsBytes();
     final base64Image = base64Encode(imageBytes);
-
+    print(_csrfToken);
     final response = await http.post(
-      Uri.parse('https://porsche.bene.photos/classify_image'),
+      Uri.parse('https://porsche.bene.photos/classify_image/'),
       headers: {
         'Content-Type': 'application/json',
+        'cookie': "csrftoken=$_csrfToken",
+        "Referer": "https://porsche.bene.photos/classify",
+        "x-csrftoken": _csrfToken
       },
-      body: jsonEncode({'image_data': base64Image}),
+      body: jsonEncode({'image_data': base64Image, "model_name": "car_type"}),
     );
 
+    print(response.statusCode);
+    print(response.body);
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
       setState(() {
@@ -69,21 +98,48 @@ class _ImageClassifierState extends State<ImageClassifier> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          _image == null
-              ? Text('No image selected')
-              : Image.file(File(_image!.path)),
-          TextButton(
-            onPressed: _pickImage,
-            child: Text('Pick Image'),
-          ),
-          TextButton(
-            onPressed: _classifyImage,
-            child: Text('Classify Image'),
-          ),
-          Text('Result: $_result'),
-        ],
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _image == null
+                ? Container(
+              height: 300,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                color: Colors.grey[200],
+              ),
+              child: Center(child: Text('No image selected')),
+            )
+                : ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.file(
+                File(_image!.path),
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _pickImage,
+              child: Text('Pick Image'),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _classifyImage,
+              child: Text('Classify Image'),
+            ),
+            SizedBox(height: 16),
+
+            Text(
+              'Result:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            SizedBox(height: 8),
+            Text(_result),
+          ],
+        ),
       ),
     );
   }
