@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(primarySwatch: Colors.blue, brightness: Brightness.dark, accentColor: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Image Classifier'),
@@ -54,6 +54,14 @@ class _ImageClassifierState extends State<ImageClassifier> {
 
   Future<void> _pickImage() async {
     final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        _image = pickedImage;
+      });
+    }
+  }
+  Future<void> _pickImageCamera() async {
+    final pickedImage = await _picker.pickImage(source: ImageSource.camera);
     if (pickedImage != null) {
       setState(() {
         _image = pickedImage;
@@ -112,30 +120,59 @@ class _ImageClassifierState extends State<ImageClassifier> {
           children: [
             _image == null
                 ? Container(
-                    height: 300,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      color: Colors.grey[200],
-                    ),
-                    child: Center(child: Text('No image selected')),
-                  )
+              height: 300,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                color: Colors.grey[900],
+              ),
+              child: Center(
+                  child: Text(
+                    'No image selected',
+                    style: TextStyle(color: Colors.grey[400]),
+                  )),
+            )
                 : ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.file(
-                      File(_image!.path),
-                      height: 300,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+              borderRadius: BorderRadius.circular(4),
+              child: Image.file(
+                File(_image!.path),
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+            ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _pickImage,
-              child: Text('Pick Image'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.image),
+                  SizedBox(width: 8),
+                  Text('Pick Image'),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).accentColor,
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _pickImageCamera,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.camera_alt),
+                  SizedBox(width: 8),
+                  Text("Take a picture"),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).accentColor,
+              ),
             ),
             SizedBox(height: 16),
             Text(
-              'Model:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                'Model:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             DropdownButton<String>(
               value: _selectedModel,
               icon: Icon(Icons.arrow_downward),
@@ -154,7 +191,17 @@ class _ImageClassifierState extends State<ImageClassifier> {
             ),
             ElevatedButton(
               onPressed: _classifyImage,
-              child: Text('Classify Image'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.directions_car),
+                  SizedBox(width: 8),
+                  Text('Classify Image'),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).accentColor,
+              ),
             ),
             SizedBox(height: 16),
             Text(
@@ -162,21 +209,51 @@ class _ImageClassifierState extends State<ImageClassifier> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             _result.length > 0
-                ? Row(
-                    children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children:
-                              _result.map((result) => Text(result[0])).toList(),
+                ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _result.map<Widget>((result) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${result[0]} (${(result[1]).toStringAsFixed(1)}%)',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).accentColor,
+                          ),
                         ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children:
-                          _result.map((result) => Text(result[1].toString())).toList(),
-                      )
+                        SizedBox(height: 4),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: result[1] /100,
+                            minHeight: 10,
+                            backgroundColor: Colors.grey[700],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).accentColor),
+                          ),
+                        ),
                       ],
-                    )
-                : Text("Results will be displayed here"),
+                    ),
+                  );
+                }).toList(),
+              ),
+            )
+                : Text(
+              "Results will be displayed here",
+              style: TextStyle(
+                fontSize: 18,
+                fontStyle: FontStyle.italic,
+                color: Colors.grey[400],
+              ),
+            ),
+
+
           ],
         ),
       ),
