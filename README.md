@@ -1,16 +1,18 @@
-# porsche_classifier
+# 🏎️ PorscheInsight-CarClassification-AI App
+This project is a Flutter app that uses three machine learning models to predict images of Porsche models. The models were created by [Flippchen](https://github.com/Flippchen/PorscheInsight-CarClassification-AI) and are hosted on a server.
 
-A new Flutter project.
+## Installation
+To run this app, clone the repository from GitHub and install all dependencies. Then, start the app by running the main.dart file.
 
-## Getting Started
+## Download the app
+You can download the app from the [Google Play Store](https://play.google.com/store/apps/details?id=de.flippchen.porscheinsight).
 
-This project is a starting point for a Flutter application.
+## Usage
+Once the app is running, select an image of a Porsche model from the gallery or take a picture with the camera. Then, select one of the available models to classify the image.
 
-A few resources to get you started if this is your first Flutter project:
+After selecting a model, click the "Classify Image" button to predict the model of the Porsche in the image. The results will be displayed as a list of possible models with their respective confidence levels.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Code
+The Flutter code for the app is provided in the main.dart file. It uses the http and image_picker packages to send image data to the server and retrieve the classification results.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The app also uses the flutter_image_compress package to compress the image before sending it to the server, in order to reduce network usage and improve performance.
