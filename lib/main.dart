@@ -31,6 +31,15 @@ class ImageClassifier extends StatefulWidget {
 }
 
 class _ImageClassifierState extends State<ImageClassifier> {
+  String _selectedModel = 'car_type';
+  // List of available models
+  Map<String, String> _modelMap = {
+    'car_type': 'Car Type',
+    'specific_model_variants': 'Car Series',
+    'all_specific_model_variants': 'All Model Variants',
+    // Add more models if needed
+  };
+
   String _csrfToken = '';
   String model = "";
   final ImagePicker _picker = ImagePicker();
@@ -81,7 +90,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
         "Referer": "https://porsche.bene.photos/classify",
         "x-csrftoken": _csrfToken
       },
-      body: jsonEncode({'image_data': base64Image, "model_name": "car_type"}),
+      body: jsonEncode({'image_data': base64Image, "model_name": _selectedModel}),
     );
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
@@ -124,6 +133,25 @@ class _ImageClassifierState extends State<ImageClassifier> {
               child: Text('Pick Image'),
             ),
             SizedBox(height: 16),
+            Text(
+              'Model:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            DropdownButton<String>(
+              value: _selectedModel,
+              icon: Icon(Icons.arrow_downward),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedModel = newValue!;
+                });
+              },
+              items: _modelMap.entries
+                  .map<DropdownMenuItem<String>>((MapEntry<String, String> entry) {
+                return DropdownMenuItem<String>(
+                  value: entry.key,
+                  child: Text(entry.value),
+                );
+              }).toList(),
+            ),
             ElevatedButton(
               onPressed: _classifyImage,
               child: Text('Classify Image'),
