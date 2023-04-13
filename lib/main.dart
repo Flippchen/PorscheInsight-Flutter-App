@@ -75,7 +75,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
 
   Future<void> _fetchCsrfToken() async {
     final response = await http.get(
-      Uri.parse('https://porsche.bene.photos/classify'),
+      Uri.parse('https://classify.autos/classify'),
     );
 
     if (response.statusCode == 200) {
@@ -111,11 +111,11 @@ class _ImageClassifierState extends State<ImageClassifier> {
     final base64Image = base64Encode(processedImageBytes);
     print(_csrfToken);
     final response = await http.post(
-      Uri.parse('https://porsche.bene.photos/classify_image/'),
+      Uri.parse('https://classify.autos/classify_image/'),
       headers: {
         'Content-Type': 'application/json',
         'cookie': "csrftoken=$_csrfToken",
-        "Referer": "https://porsche.bene.photos/classify",
+        "Referer": "https://classify.autos/classify",
         "x-csrftoken": _csrfToken
       },
       body: jsonEncode({'image_data': base64Image, "model_name": _selectedModel}),
