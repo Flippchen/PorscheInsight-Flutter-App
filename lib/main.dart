@@ -40,7 +40,6 @@ class _ImageClassifierState extends State<ImageClassifier> {
     'car_type': 'Car Type',
     'specific_model_variants': 'Car Series',
     'all_specific_model_variants': 'All Model Variants',
-    // Add more models if needed
   };
 
   String _csrfToken = '';
@@ -57,32 +56,52 @@ class _ImageClassifierState extends State<ImageClassifier> {
   }
 
   Future<void> _pickImage() async {
-    final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      setState(() {
-        _image = pickedImage;
-      });
+    try {
+      final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedImage != null) {
+        setState(() {
+          _image = pickedImage;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error picking image: ${e.toString()}")),
+      );
     }
   }
   Future<void> _pickImageCamera() async {
-    final pickedImage = await _picker.pickImage(source: ImageSource.camera);
-    if (pickedImage != null) {
-      setState(() {
-        _image = pickedImage;
-      });
+    try {
+      final pickedImage = await _picker.pickImage(source: ImageSource.camera);
+      if (pickedImage != null) {
+        setState(() {
+          _image = pickedImage;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error taking picture: ${e.toString()}")),
+      );
     }
   }
 
   Future<void> _fetchCsrfToken() async {
-    final response = await http.get(
-      Uri.parse('https://classify.autos/classify'),
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('https://classify.autos/classify'),
+      );
 
-    if (response.statusCode == 200) {
-      setState(() {
-        _csrfToken =
-            response.headers['set-cookie']!.split(';')[0].split('=')[1];
-      });
+      if (response.statusCode == 200) {
+        setState(() {
+          _csrfToken =
+          response.headers['set-cookie']!.split(';')[0].split('=')[1];
+        });
+      } else {
+        throw Exception("Error fetching CSRF token. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching CSRF token: ${e.toString()}")),
+      );
     }
   }
 
@@ -110,6 +129,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
     }
     final base64Image = base64Encode(processedImageBytes);
     print(_csrfToken);
+    try {
     final response = await http.post(
       Uri.parse('https://classify.autos/classify_image/'),
       headers: {
@@ -130,6 +150,10 @@ class _ImageClassifierState extends State<ImageClassifier> {
         print(result.runtimeType);
         _result = result;
       });
+    }} catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error classifying image: ${e.toString()}")),
+      );
     }
   }
 
