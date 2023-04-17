@@ -1,6 +1,8 @@
 # 🏎️ PorscheInsight-CarClassification-AI App
 This project is a Flutter app that uses three machine learning models to predict images of Porsche models. The models were created by [Flippchen](https://github.com/Flippchen/PorscheInsight-CarClassification-AI) and are hosted on a server.
 
+<a href='https://play.google.com/store/apps/details?id=com.flippchen.porsche_classifier'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height="70"/></a>
+
 ## Installation
 To run this app, clone the repository from GitHub and install all dependencies. Then, start the app by running the main.dart file.
 
