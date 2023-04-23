@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-
 void main() {
   runApp(MyApp());
 }
@@ -17,7 +16,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue, brightness: Brightness.dark, accentColor: Colors.blue),
+      theme: ThemeData(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.dark,
+          accentColor: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Porsche Classifier'),
@@ -69,6 +71,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
       );
     }
   }
+
   Future<void> _pickImageCamera() async {
     try {
       final pickedImage = await _picker.pickImage(source: ImageSource.camera);
@@ -93,10 +96,11 @@ class _ImageClassifierState extends State<ImageClassifier> {
       if (response.statusCode == 200) {
         setState(() {
           _csrfToken =
-          response.headers['set-cookie']!.split(';')[0].split('=')[1];
+              response.headers['set-cookie']!.split(';')[0].split('=')[1];
         });
       } else {
-        throw Exception("Error fetching CSRF token. Status code: ${response.statusCode}");
+        throw Exception(
+            "Error fetching CSRF token. Status code: ${response.statusCode}");
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -130,27 +134,29 @@ class _ImageClassifierState extends State<ImageClassifier> {
     final base64Image = base64Encode(processedImageBytes);
     print(_csrfToken);
     try {
-    final response = await http.post(
-      Uri.parse('https://classify.autos/classify_image/'),
-      headers: {
-        'Content-Type': 'application/json',
-        'cookie': "csrftoken=$_csrfToken",
-        "Referer": "https://classify.autos/classify",
-        "x-csrftoken": _csrfToken
-      },
-      body: jsonEncode({'image_data': base64Image, "model_name": _selectedModel}),
-    );
-    setState(() {
-      _isloading = false;
-    });
-    if (response.statusCode == 200) {
-      final result = jsonDecode(response.body);
+      final response = await http.post(
+        Uri.parse('https://classify.autos/classify_image/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'cookie': "csrftoken=$_csrfToken",
+          "Referer": "https://classify.autos/classify",
+          "x-csrftoken": _csrfToken
+        },
+        body: jsonEncode(
+            {'image_data': base64Image, "model_name": _selectedModel}),
+      );
       setState(() {
-        print(result);
-        print(result.runtimeType);
-        _result = result;
+        _isloading = false;
       });
-    }} catch (e) {
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        setState(() {
+          print(result);
+          print(result.runtimeType);
+          _result = result;
+        });
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error classifying image: ${e.toString()}")),
       );
@@ -166,38 +172,56 @@ class _ImageClassifierState extends State<ImageClassifier> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _image == null
-                ? Container(
-              height: 300,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                color: Colors.grey[900],
-              ),
-              child: Center(
-                  child: Text(
-                    'No image selected',
-                    style: TextStyle(color: Colors.grey[400]),
-                  )),
-            )
+                ? Card(
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Container(
+                      height: 300,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey[900],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'No image selected',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 18,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
                 : ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.file(
-                File(_image!.path),
-                height: 300,
-                fit: BoxFit.cover,
-              ),
-            ),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      File(_image!.path),
+                      height: 300,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _pickImage,
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).accentColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                elevation: 4.0,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Icon(Icons.image),
                   SizedBox(width: 8),
-                  Text('Pick Image'),
+                  Text(
+                    'Pick Image',
+                    style: TextStyle(fontFamily: 'Poppins'),
+                  ),
                 ],
               ),
             ),
@@ -206,20 +230,32 @@ class _ImageClassifierState extends State<ImageClassifier> {
               onPressed: _pickImageCamera,
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).accentColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                elevation: 4.0,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Icon(Icons.camera_alt),
                   SizedBox(width: 8),
-                  Text("Take a picture"),
+                  Text(
+                    "Take a picture",
+                    style: TextStyle(fontFamily: 'Poppins'),
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
             const Text(
-                'Model:',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              'Model:',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
             DropdownButton<String>(
               value: _selectedModel,
               icon: const Icon(Icons.arrow_downward),
@@ -237,71 +273,92 @@ class _ImageClassifierState extends State<ImageClassifier> {
               }).toList(),
             ),
             ElevatedButton(
-              onPressed: _isloading? null: _classifyImage,
+              onPressed: _isloading ? null : _classifyImage,
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).accentColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                elevation: 4.0,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Icon(Icons.directions_car),
                   SizedBox(width: 8),
-                  Text('Classify Image'),
+                  Text(
+                    'Classify Image',
+                    style: TextStyle(fontFamily: 'Poppins'),
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
             const Text(
               'Result:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            _isloading? Center(child: SizedBox(width: 50, height:50,child: const CircularProgressIndicator())):
-            _result.length > 0
-                ? Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _result.map<Widget>((result) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${result[0]} (${(result[1]).toStringAsFixed(1)}%)',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: result[1] /100,
-                            minHeight: 10,
-                            backgroundColor: Colors.grey[700],
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).accentColor),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-            )
-                : Text(
-              "Results will be displayed here",
               style: TextStyle(
-                fontSize: 18,
-                fontStyle: FontStyle.italic,
-                color: Colors.grey[400],
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
-
-
+            const SizedBox(height: 10),
+            _isloading
+                ? Center(
+                    child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: const CircularProgressIndicator(),
+                    ),
+                  )
+                : _result.length > 0
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _result.map<Widget>((result) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${result[0]} (${(result[1]).toStringAsFixed(1)}%)',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).accentColor,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: LinearProgressIndicator(
+                                      value: result[1] / 100,
+                                      minHeight: 10,
+                                      backgroundColor: Colors.grey[700],
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Theme.of(context).accentColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      )
+                    : Text(
+                        "Results will be displayed here",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 18,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey[400],
+                        ),
+                      ),
           ],
         ),
       ),
