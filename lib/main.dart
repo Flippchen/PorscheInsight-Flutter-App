@@ -92,11 +92,10 @@ class _ImageClassifierState extends State<ImageClassifier> {
       final response = await http.get(
         Uri.parse('https://classify.autos/classify'),
       );
-
       if (response.statusCode == 200) {
         setState(() {
           _csrfToken =
-              response.headers['set-cookie']!.split(';')[0].split('=')[1];
+          response.headers['set-cookie']!.split(';')[0].split('=')[1];
         });
       } else {
         throw Exception(
@@ -108,6 +107,7 @@ class _ImageClassifierState extends State<ImageClassifier> {
       );
     }
   }
+
 
   Future<void> _classifyImage() async {
     if (_image == null) {
